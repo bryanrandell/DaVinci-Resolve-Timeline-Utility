@@ -11,7 +11,7 @@ I could implement a lot of over function, don't hesitate to ask, if you have som
 If you never installed a Workflow Itegration Plugin in Davinci, 
 put the folder Workflow Integration Plugin in "%PROGRAMDATA%\Blackmagic Design\DaVinci Resolve\Support\" (On Windows) or 
 "/Library/Application Support/Blackmagic Design/DaVinci Resolve" (on Mac OS). If you have already a Workflow Integration Plugin folder,
-put the "ui_timeline_utility.py" file and "utils" folder inside the latter.
+put the "ui_timeline_utility.py" file and "python_utils" folder inside the latter.
 Then finally restart Davinci Resolve if it was opened.
 
 ## Usage 
