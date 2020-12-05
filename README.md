@@ -5,7 +5,7 @@ A plugin who open a window with all the timeline for the current project listed,
 You can also filter the timelines by name. Can be helpfull when you have to manage a lot of timelines in a project.
 I could implement a lot of over function, don't hesitate to ask, if you have some ideas.
 
-## Needs Davinci 17
+## Needs Davinci Resolve 17
 
 ## Installation
 If you never installed a Workflow Itegration Plugin in Davinci, 
