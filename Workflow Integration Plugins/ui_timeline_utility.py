@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Timeline Utility. Requires DaVinci Resolve Studio 16.2.6 or higher.
+# Timeline Utility. Requires DaVinci Resolve Studio 17.
 # Copyright (c) 2020 Bryan Randell
 
 import sys
