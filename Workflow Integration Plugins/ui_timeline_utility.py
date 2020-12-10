@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Timeline Utility. Requires DaVinci Resolve Studio 17.
+# Timeline Utility. Requires DaVinci Resolve Studio 17
 # Copyright (c) 2020 Bryan Randell
 
 import sys
@@ -14,10 +14,35 @@ except:
     from python_utils.python_get_resolve import GetResolve
     resolve = GetResolve()
 
+from python_utils.export_timeline_audio_sync import timeline_sync_export
+
+def add_popup_window(popup_string):
+    # ui IDs
+    dialogID = "com.blackmagicdesign.resolve.dialog"
+    buttonID = 'Button_OK'
+
+    dialog = dispatcher.AddWindow({'ID': dialogID, 'Geometry': [100, 100, 300, 200], 'WindowTitle': "Dialog", "WindowFlags" : {"Window" : True, "WindowStaysOnTopHint" : True},},
+                                  ui.VGroup([
+                                  ui.Label({'Text': popup_string,
+                                            'Weight': 0.2,
+                                            'Font': ui.Font({'Family': "Times New Roman"})}),
+                                  ui.HGroup({'Weight': 0.1},[
+                                  ui.Button({'ID': buttonID, 'Text': 'OK',})
+                                  ])]))
+    def OnClosedialog(ev):
+        dialog.Hide()
+
+    dialog.On[dialogID].Close = OnClosedialog
+    dialog.On[buttonID].Clicked = OnClosedialog
+    dialog.Show()
+    # dispatcher.RunLoop()
+    return dialog, dialog.GetItems()
+
+
 # Row Creation
-def list_row_creation(current_project, tree_item):
+def list_row_creation(current_project, tree_item, tree_timelineID):
     for timeline_index in range(current_project.GetTimelineCount()):
-        item_row = tree_item['Tree_Timeline'].NewItem()
+        item_row = tree_item[tree_timelineID].NewItem()
         item_row.Text[0] = '{}'.format(timeline_index + 1)
         item_row.Text[1] = '{}'.format(current_project.GetTimelineByIndex(timeline_index + 1).GetName())
         item_row.Text[2] = '{}'.format(len(current_project.GetTimelineByIndex(timeline_index + 1).GetItemListInTrack('Video', 1)))
@@ -29,12 +54,12 @@ def list_row_creation(current_project, tree_item):
         print(item_row.Text[2])
         print(item_row.Text[3])
         print(item_row.Text[4])
-        tree_item['Tree_Timeline'].AddTopLevelItem(item_row)
+        tree_item[tree_timelineID].AddTopLevelItem(item_row)
 
 
-def list_row_creation_filtered(current_project, tree_item, filter_string):
+def list_row_creation_filtered(current_project, tree_item, filter_string, tree_timelineID):
     for timeline_index in range(current_project.GetTimelineCount()):
-        item_row = tree_item['Tree_Timeline'].NewItem()
+        item_row = tree_item[tree_timelineID].NewItem()
         item_row.Text[0] = '{}'.format(timeline_index + 1)
         item_row.Text[1] = '{}'.format(current_project.GetTimelineByIndex(timeline_index + 1).GetName())
         item_row.Text[2] = '{}'.format(len(current_project.GetTimelineByIndex(timeline_index + 1).GetItemListInTrack('Video', 1)))
@@ -47,7 +72,7 @@ def list_row_creation_filtered(current_project, tree_item, filter_string):
         print(item_row.Text[3])
         print(item_row.Text[4])
         if current_project.GetTimelineByIndex(timeline_index + 1).GetName().lower().find(filter_string) != -1:
-            tree_item['Tree_Timeline'].AddTopLevelItem(item_row)
+            tree_item[tree_timelineID].AddTopLevelItem(item_row)
 
 
 project_manager = resolve.GetProjectManager()
@@ -55,7 +80,11 @@ current_project = project_manager.GetCurrentProject()
 print(current_project.GetName())
 
 # some element IDs
-winID = "com.blackmagicdesign.resolve.test_ui"	# should be unique for single instancing
+winID = "com.blackmagicdesign.resolve.timeline_utility"	# should be unique for single instancing
+line_edit_searchID = 'LineEditSearch'
+button_refreshID = 'Button_Refresh'
+tree_timelineID = 'Tree_Timeline'
+button_exportID = 'Button_Export'
 
 # calling DavinciResolve UI in Workflow Integration
 ui = fusion.UIManager
@@ -69,7 +98,7 @@ if main_window:
     exit()
 
 # otherwise, we set up a new window, with HTML header (using the Examples logo.png)
-header = '<html><body><h1 style="vertical-align:middle;">'
+header = '<html><body><h1 style="horizontal-align:middle;">'
 header = header + '<b>DaVinci Resolve Timeline Utility</b>'
 header = header + '</h1></body></html>'
 
@@ -79,21 +108,25 @@ main_window = dispatcher.AddWindow({'ID': winID, 'Geometry': [100, 100, 600, 500
     ui.VGroup([
       ui.Label({'Text': header, 'Weight': 0.1, 'Font': ui.Font({'Family': "Times New Roman"})}),
 
-      ui.LineEdit({'ID': 'LineEditSearch', 'Text': '', 'PlaceholderText': 'Filter Timelines by Name', }),
+    ui.HGroup({ 'Weight': 0.1 }, [
+      ui.LineEdit({'ID': line_edit_searchID, 'Text': '', 'PlaceholderText': 'Filter Timelines by Name', }),
+      ui.Button({'ID': button_refreshID, 'Text': 'Refresh List'},)
+      ]),
 
-      ui.Label({'Text': 'Timeline List', 'Weight': 0.1, 'Font': ui.Font({'Family': "Times New Roman"})}),
-      ui.Tree({'ID': 'Tree_Timeline', 'SortingEnabled': True, 'Events' : {'ItemDoubleClicked': True, 'ItemClicked': True}, }),
+      ui.Label({'Text': 'Timeline List', 'Weight': 0.1, 'Font': ui.Font({'Family': "Times New Roman", 'PixelSize': 24})}),
+      ui.Tree({'ID': tree_timelineID, 'SortingEnabled': True, 'Events' : {'ItemDoubleClicked': True, 'ItemClicked': True}, }),
 
-      ui.HGroup({ 'Weight': 0.1 }, [
-      ui.Button({'ID': 'Button_Refresh', 'Text': 'Refresh List'},)
-      ])]))
+    ui.HGroup({ 'Weight': 0.1 }, [
+      ui.Button({'ID': button_exportID, 'Text': 'Export Timeline'},)
+      ]
+                )]))
 
 
 # Tree Item definition
-tree_item = main_window.GetItems()
+main_window_item = main_window.GetItems()
 
 # Header/Column Creation
-column_header = tree_item['Tree_Timeline'].NewItem()
+column_header = main_window_item[tree_timelineID].NewItem()
 column_header.Text[0] = 'Index'
 column_header.Text[1] = 'Name'
 column_header.Text[2] = 'Number of Video Clips'
@@ -101,11 +134,11 @@ column_header.Text[3] = 'Resolution'
 column_header.Text[4] = 'Frame Rate'
 
 
-tree_item['Tree_Timeline'].SetHeaderItem(column_header)
-tree_item['Tree_Timeline'].ColumnCount = 5
-tree_item['Tree_Timeline'].ColumnWidth[0] = 100
+main_window_item[tree_timelineID].SetHeaderItem(column_header)
+main_window_item[tree_timelineID].ColumnCount = 5
+main_window_item[tree_timelineID].ColumnWidth[0] = 100
 
-list_row_creation(current_project, tree_item)
+list_row_creation(current_project, main_window_item, tree_timelineID)
 
 
 # Functions for Event handlers
@@ -118,30 +151,48 @@ def OnClickRefresh(ev):
     :param ev:
     :return:
     """
-    tree_item['Tree_Timeline'].Clear()
-    list_row_creation(current_project, tree_item)
+    main_window_item[tree_timelineID].Clear()
+    list_row_creation(current_project, main_window_item, tree_timelineID)
     print('List Refreshed')
 
-def OnClickFilter(ev):
-    print(tree_item['LineEditSearch'].SelectedText())
+# def OnClickFilter(ev):
+#     print(tree_item['LineEditSearch'].SelectedText())
 
 def OnTextChanged(ev):
-    print('test has changed')
-    tree_item['Tree_Timeline'].Clear()
-    list_row_creation_filtered(current_project, tree_item, tree_item['LineEditSearch'].Text)
-
+    # print('test has changed')
+    main_window_item[tree_timelineID].Clear()
+    list_row_creation_filtered(current_project,
+                               main_window_item,
+                               main_window_item[line_edit_searchID].Text,
+                               tree_timelineID)
 
 def OnClickTree(ev):
-    print(tree_item['Tree_Timeline'].CurrentItem().Text[0])
-    current_project.SetCurrentTimeline(current_project.GetTimelineByIndex(int(tree_item['Tree_Timeline'].CurrentItem().Text[0])))
+    print(main_window_item[tree_timelineID].CurrentItem().Text[0])
+    current_project.SetCurrentTimeline(current_project.GetTimelineByIndex(int(main_window_item[tree_timelineID].CurrentItem().Text[0])))
 
+def OnClickExport(ev):
+    print('exporting timeline...')
+    # directory = fusion.RequestDir('C:\\')
+    # print(directory)
+    job_ready_count = timeline_sync_export(dvr)
+
+    if job_ready_count == 0:
+        _, _ = add_popup_window("Didn't find any Job Ready in the Render Queue")
+    else:
+        _, _ = add_popup_window('Timeline successfully exported')
+
+
+def OnClickExplorer(ev):
+    directory = fusion.RequestDir('C:\\')
+    print(directory)
 
 # assign event handlers
 main_window.On[winID].Close = OnClose
-main_window.On['Tree_Timeline'].ItemClicked = OnClickTree
-main_window.On['Button_Refresh'].Clicked = OnClickRefresh
-main_window.On['Button_Filter'].Clicked = OnClickFilter
-main_window.On['LineEditSearch'].TextChanged = OnTextChanged
+main_window.On[line_edit_searchID].TextChanged = OnTextChanged
+main_window.On[tree_timelineID].ItemClicked = OnClickTree
+main_window.On[button_refreshID].Clicked = OnClickRefresh
+# main_window.On['Button_Filter'].Clicked = OnClickFilter
+main_window.On[button_exportID].Clicked = OnClickExport
 # main_window.On['Tree'].ItemDoubleClicked = OnDoubleClickTree
 
 
