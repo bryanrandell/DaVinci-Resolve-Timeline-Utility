@@ -16,5 +16,5 @@ Then finally restart Davinci Resolve if it was opened.
 
 ## Usage 
 In Davinci Resolve go to Workspace > Workflow Integration click on ui_timeline_utility it will open a small window.
-
+The "Export Timeline as Individual clips Hack" button makes possible to export a timeline's clip individually with all the single clip option available, including the sound manually synced in the timeline.
 
