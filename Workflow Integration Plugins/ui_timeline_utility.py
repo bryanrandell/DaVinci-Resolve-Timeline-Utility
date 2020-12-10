@@ -117,9 +117,11 @@ main_window = dispatcher.AddWindow({'ID': winID, 'Geometry': [100, 100, 600, 500
       ui.Tree({'ID': tree_timelineID, 'SortingEnabled': True, 'Events' : {'ItemDoubleClicked': True, 'ItemClicked': True}, }),
 
     ui.HGroup({ 'Weight': 0.1 }, [
-      ui.Button({'ID': button_exportID, 'Text': 'Export Timeline'},)
-      ]
-                )]))
+      ui.Button({'ID': button_exportID, 'Text': 'Export Timeline as Individual clips Hack'},)
+      ]),
+    ui.Label({'Text': 'In order to export hack your timeline'
+                })
+    ]))
 
 
 # Tree Item definition
