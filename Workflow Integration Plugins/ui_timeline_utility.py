@@ -7,12 +7,12 @@
 import sys
 
 # import DaVinciResolveScript
-try:
-    import DaVinciResolveScript as dvr
-    resolve = dvr.scriptapp('Resolve')
-except:
-    from python_utils.python_get_resolve import GetResolve
-    resolve = GetResolve()
+#try:
+#    import DaVinciResolveScript as dvr
+#    resolve = dvr.scriptapp('Resolve')
+#except:
+#    from python_utils.python_get_resolve import GetResolve
+#    resolve = GetResolve()
 
 from python_utils.export_timeline_audio_sync import timeline_sync_export
 
