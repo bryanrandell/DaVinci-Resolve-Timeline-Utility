@@ -20,3 +20,4 @@ The "Export Single Clip Hack" button makes possible to export a timeline's clip 
 
 ## Requirement
 You need ffmpeg install, type "brew install ffmpeg" in the terminal on macos.
+Or go to https://ffmpeg.org/download.html to get executable files for mac/linux or windows.
