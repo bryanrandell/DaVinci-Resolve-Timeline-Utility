@@ -20,5 +20,5 @@ The "Export Single Clip Hack" button makes possible to export a timeline's clip 
 Export single clip hack handles prores exports and mxf op-atom (didn't test yet on other format).
 
 ## Requirement
-You need ffmpeg install, type "brew install ffmpeg" in the terminal on macos.
+You need ffmpeg (version 5.0) install, type "brew install ffmpeg" in the terminal on macos.
 Or go to https://ffmpeg.org/download.html to get executable files for mac/linux or windows.
