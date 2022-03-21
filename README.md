@@ -17,6 +17,7 @@ Then finally restart Davinci Resolve if it was opened.
 ## Usage 
 In Davinci Resolve go to Workspace > Workflow Integration click on ui_timeline_utility it will open a small window.
 The "Export Single Clip Hack" button makes possible to export a timeline's clip individually with all the single clip option available, including the sound manually synced in the timeline and the timecode is copy in the metadata of the file thanks to ffmpeg (it's a workaround for know cause resolve scriptapp doesn't handles timecode in render for the moment).
+Export single clip hack handles prores exports and mxf op-atom (didn't test yet on other format).
 
 ## Requirement
 You need ffmpeg install, type "brew install ffmpeg" in the terminal on macos.
