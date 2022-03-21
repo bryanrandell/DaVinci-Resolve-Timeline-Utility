@@ -11,7 +11,7 @@ import shutil
 
 import dictionary as dictionary
 
-from .ffmpeg_command_line import runFFmpeg, buildFFmpegCommand
+from .ffmpeg_command_line import runFFmpeg, buildFFmpegCommand, buildFFmpegCommandAudio
 """
 video_change_timecode_dict["input_file"],
 "-metadata",
@@ -238,7 +238,7 @@ def timeline_sync_export(resolve):
                                 print("The file {} does not exist".format(temp_video_path))
 
                             for audio_file in list_temp_video_audio_files:
-                                runFFmpeg(buildFFmpegCommand(audio_file, dictionary_filename_with_tc[temp_video_path]))
+                                runFFmpeg(buildFFmpegCommandAudio(audio_file, dictionary_filename_with_tc[temp_video_path]))
                                 print("Copy TC from original video at path {}  the transcoded".format(temp_video_path))
                                 # suppress the temporary file create with render to keep only the video file with good timecode
 
