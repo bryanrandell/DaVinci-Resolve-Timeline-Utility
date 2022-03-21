@@ -221,17 +221,42 @@ def timeline_sync_export(resolve):
 
                     current_project.DeleteRenderJob(job_id)
                     print("Done JOB {}".format(job_id))
-
+                    
                     # run ffmpeg to copy timecode from mediapool file to the render file
                     for temp_video_path in dictionary_filename_with_tc:
-                        runFFmpeg(buildFFmpegCommand(temp_video_path, dictionary_filename_with_tc[temp_video_path]))
-                        print("Copy TC from original video at path {}  the transcoded".format(temp_video_path))
-                        # suppress the temporary file create with render to keep only the video file with good timecode
-                        if os.path.exists(temp_video_path):
-                            os.remove(temp_video_path)
-                        else:
-                            print("The file {} does not exist".format(temp_video_path))
+                        print("------- format------{}".format(current_job['VideoFormat']))
+                        if current_job['VideoFormat'] == 'MXF OP-Atom':
+                            # an ugly way to looking for mxf audio files
+                            list_temp_video_audio_files = [os.path.join(sub_folder, i) for i in os.listdir(sub_folder) if os.path.join(sub_folder, i[:-8]) == temp_video_path[:-4] and i[-7] == "A" ]
+                            print("------- format------{}".format(list_temp_video_audio_files))
+                            runFFmpeg(buildFFmpegCommand(temp_video_path, dictionary_filename_with_tc[temp_video_path]))
+                            print("Copy TC from original video at path {}  the transcoded".format(temp_video_path))
+                            # suppress the temporary file create with render to keep only the video file with good timecode
+                            if os.path.exists(temp_video_path):
+                                os.remove(temp_video_path)
+                            else:
+                                print("The file {} does not exist".format(temp_video_path))
 
+                            for audio_file in list_temp_video_audio_files:
+                                runFFmpeg(buildFFmpegCommand(audio_file, dictionary_filename_with_tc[temp_video_path]))
+                                print("Copy TC from original video at path {}  the transcoded".format(temp_video_path))
+                                # suppress the temporary file create with render to keep only the video file with good timecode
+
+                                if os.path.exists(audio_file):
+                                    os.remove(audio_file)
+                                else:
+                                    print("The file {} does not exist".format(audio_file))
+
+                        else:
+
+                            runFFmpeg(buildFFmpegCommand(temp_video_path, dictionary_filename_with_tc[temp_video_path]))
+                            print("Copy TC from original video at path {}  the transcoded".format(temp_video_path))
+                            # suppress the temporary file create with render to keep only the video file with good timecode
+                            if os.path.exists(temp_video_path):
+                                os.remove(temp_video_path)
+                            else:
+                                print("The file {} does not exist".format(temp_video_path))
+                    
                 else:
                     print('Job {} is Not Ready'.format(job_id))
 
