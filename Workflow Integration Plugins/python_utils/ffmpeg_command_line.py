@@ -65,6 +65,28 @@ def buildFFmpegCommand(temp_file_path, timecode):
 
     return commands_list
 
+def buildFFmpegCommandAudio(temp_file_path, timecode):
+    """
+    build the command line for ffmpeg for mxf op-atom audio files
+    :param video_change_timecode_dict:
+    :return:
+    """
+    output_file_path = temp_file_path.split("_temp_")[0] + temp_file_path.split("_temp_")[1]
+    commands_list = [
+        ffmpeg,
+        "-i",
+        temp_file_path,
+        "-metadata",
+        'timecode={}'.format(timecode),
+        "-f",
+        "mxf_opatom",
+        output_file_path
+    ]
+
+    return commands_list
+
+
+
 def runFFmpeg(commands):
     """
     run the ffmpeg in the terminal
