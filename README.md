@@ -1,7 +1,7 @@
 # Davinci-Resolve-Timeline-Utility
 
 ## Description
-A plugin who open a window with all the timeline for the current project listed, you can select a timeline inside Davinci by clicking into the list.
+A plugin which opens a window with all the timeline for the current project listed, you can select a timeline inside Davinci by clicking into the list.
 You can also filter the timelines by name. Can be helpfull when you have to manage a lot of timelines in a project.
 I could implement a lot of over function, don't hesitate to ask, if you have some ideas.
 
